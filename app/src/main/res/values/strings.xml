@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Diploma</string>
+
+
+    <string name="title_goods">Товары</string>
+    <string name="title_purchases">Покупки</string>
+    <string name="title_stores">Магазины</string>
+
+    <!-- Форма добавления -->
+
+
+    <!-- Информация о магазине -->
+    <string name="storeInf_points">Точки продаж</string>
+    <string name="storeInf_sum">на сумму</string>
+    <string name="storeInf_noAddress">Точка без адреса</string>
+
+    <!--Информация о товаре-->
+    <string name="goodInf_lastPrice">Последняя цена</string>
+    <string name="goodInf_dynamic">Динамика цена</string>
+    <string name="goodInf_minPrice">Минимальная цена</string>
+    <string name="goodInf_maxPrice">Максимальная цена</string>
+</resources>
