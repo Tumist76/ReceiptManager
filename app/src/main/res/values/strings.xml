@@ -5,7 +5,7 @@
     <string name="title_goods">Товары</string>
     <string name="title_purchases">Покупки</string>
     <string name="title_stores">Магазины</string>
-
+    <string name="action_help">Справка</string>
     <!-- Форма добавления -->
 
 
@@ -19,4 +19,15 @@
     <string name="goodInf_dynamic">Динамика цена</string>
     <string name="goodInf_minPrice">Минимальная цена</string>
     <string name="goodInf_maxPrice">Максимальная цена</string>
+
+    <string name="item_name">Название</string>
+    <string name="item_price">Цена</string>
+    <string name="item_sum">Стоимость</string>
+    <string name="item_quantity">Количество</string>
+    <string name="item_nds18">НДС 18%</string>
+    <string name="item_nds10">НДС 10%</string>
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
