@@ -19,6 +19,6 @@ public class WebViewActivity extends AppCompatActivity {
         webview.getSettings().setJavaScriptEnabled(true);
         webview.getSettings().setDomStorageEnabled(true);
         webview.setOverScrollMode(WebView.OVER_SCROLL_NEVER);
-        webview.loadUrl("https://tumist76.github.io/costcaculator/");
+        webview.loadUrl("https://tumist76.github.io/ReceiptManager/");
     }
 }
