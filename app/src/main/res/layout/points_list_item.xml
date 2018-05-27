@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Layout for a single list item in the list of pets -->
 <LinearLayout
-    android:id="@+id/layout_purchases_list_item"
+    android:id="@+id/layout_store_list_item"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,33 +9,23 @@
     android:orientation="horizontal"
 
     >
-    <LinearLayout
+    <RelativeLayout
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="2"
-        android:orientation="vertical"
         android:layout_marginLeft="8dp">
 
         <TextView
-            android:id="@+id/items_list_item_name"
-            android:layout_width="220dp"
-            android:height="22dp"
-            android:textSize="16sp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:fontFamily="sans-serif"
-            tools:text="Вода Холодный ручей 5л негаз. очень вкусная и приятная, мне нравится" />
-
-        <TextView
-            android:id="@+id/items_list_item_amount"
+            android:id="@+id/point_list_item_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:fontFamily="sans-serif"
-            android:textColor="#AEB6BD"
-            tools:text="0.228" />
-    </LinearLayout>
+            tools:text="Тестовый магазин" />
+
+    </RelativeLayout>
     <LinearLayout
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
@@ -47,24 +37,24 @@
         android:layout_marginRight="16dp">
 
         <TextView
-            android:id="@+id/items_list_item_totalSum"
+            android:id="@+id/point_list_item_amount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
             android:gravity="end"
             android:textAppearance="?android:textAppearanceMedium"
             android:textColor="#2B3D4D"
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp"
-            tools:text="84.49 Р" />
+            tools:text="5" />
         <TextView
-            android:id="@+id/items_list_item_price"
+            android:id="@+id/point_list_item_word_purchase"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:gravity="right"
             android:fontFamily="sans-serif"
-            tools:text="349 Р" />
+            tools:text="покупок" />
     </LinearLayout>
+
 
 
 

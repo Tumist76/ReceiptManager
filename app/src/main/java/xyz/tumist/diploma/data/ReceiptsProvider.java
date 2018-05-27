@@ -201,6 +201,7 @@ public class ReceiptsProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues contentValues, String selection,
                       String[] selectionArgs) {
+        //TODO: Понять, что возвращается - количество обновлённых строк или ID обновленной строки
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case GOODS:
@@ -245,7 +246,7 @@ public class ReceiptsProvider extends ContentProvider {
                 rowsDeleted = database.delete(DataContract.GoodEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case PURCHASES:
-                rowsDeleted = database.delete(DataContract.GoodEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = database.delete(DataContract.PurchaseEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case PURCHASE_ID:
                 selection = DataContract.PurchaseEntry.COLUMN_PURCHASE_ID + "=?";

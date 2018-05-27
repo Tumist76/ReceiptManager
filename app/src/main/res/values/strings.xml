@@ -6,6 +6,8 @@
     <string name="title_purchases">Покупки</string>
     <string name="title_stores">Магазины</string>
     <string name="action_help">Справка</string>
+    <string name="action_delete">Удалить</string>
+    <string name="action_rename">Переименовать</string>
     <!-- Форма добавления -->
 
 

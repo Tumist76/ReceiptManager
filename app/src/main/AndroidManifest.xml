@@ -42,8 +42,11 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".ItemActivity"></activity>
-        <activity android:name=".WebViewActivity"></activity>
+        <activity android:name=".ItemActivity" />
+        <activity android:name=".WebViewActivity" />
+        <activity android:name=".PurchaseActivity" />
+        <activity android:name=".StoreActivity" />
+        <activity android:name=".PointActivity"></activity>
     </application>
 
 </manifest>

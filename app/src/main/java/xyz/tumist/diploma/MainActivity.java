@@ -11,7 +11,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
+
+import xyz.tumist.diploma.main_page.ItemsFragment;
+import xyz.tumist.diploma.main_page.PurchasesFragment;
+import xyz.tumist.diploma.main_page.StoresFragment;
 
 public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = MainActivity.class.getSimpleName();

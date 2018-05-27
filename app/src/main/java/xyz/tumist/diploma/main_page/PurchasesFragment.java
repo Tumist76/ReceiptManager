@@ -1,4 +1,4 @@
-package xyz.tumist.diploma;
+package xyz.tumist.diploma.main_page;
 
 import android.content.ContentUris;
 import android.content.Intent;
@@ -13,19 +13,15 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import xyz.tumist.diploma.PurchaseActivity;
+import xyz.tumist.diploma.PurchaseCursorAdapter;
+import xyz.tumist.diploma.R;
 import xyz.tumist.diploma.data.DataContract;
 import xyz.tumist.diploma.data.ReceiptsDBHelper;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ItemsFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ItemsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class ItemsFragment extends Fragment {
+
+public class PurchasesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -37,23 +33,24 @@ public class ItemsFragment extends Fragment {
         // Setup any handles to view objects here
         // TodoDatabaseHandler is a SQLiteOpenHelper class connecting to SQLite
         ReceiptsDBHelper handler = new ReceiptsDBHelper(getContext());
-        // Get access to the underlying writeable database
+// Get access to the underlying writeable database
         SQLiteDatabase db = handler.getWritableDatabase();
-        // Query for items from the database and get a cursor back
-        Cursor storeCursor = db.rawQuery("SELECT  * FROM " + DataContract.GoodEntry.TABLE_NAME, null);
+// Query for items from the database and get a cursor back
+        Cursor purchaseCursor = db.rawQuery("SELECT  * FROM " + DataContract.PurchaseEntry.TABLE_NAME + " ORDER BY "+ DataContract.PurchaseEntry.COLUMN_PURCHASE_DATETIME + " DESC"
+                ,null);
         // Find ListView to populate
-        ListView lvItems = (ListView) view.findViewById(R.id.fragment_list);
-        // Setup cursor adapter using cursor from last step
-        ItemCursorAdapter storeAdapter = new ItemCursorAdapter(getContext(), storeCursor);
-        // Attach cursor adapter to the ListView
-        lvItems.setAdapter(storeAdapter);
-        lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        ListView lvPurchases = (ListView) view.findViewById(R.id.fragment_listview);
+// Setup cursor adapter using cursor from last step
+        PurchaseCursorAdapter purchaseAdapter = new PurchaseCursorAdapter(getContext(), purchaseCursor);
+// Attach cursor adapter to the ListView
+        lvPurchases.setAdapter(purchaseAdapter);
+        lvPurchases.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Intent intent = new Intent(getContext(), ItemActivity.class);
-                Uri currentDebtUri = ContentUris.withAppendedId(DataContract.GoodEntry.CONTENT_URI, id);
+                Intent intent = new Intent(getContext(), PurchaseActivity.class);
+                Uri currentPurchaseUri = ContentUris.withAppendedId(DataContract.PurchaseEntry.CONTENT_URI, id);
                 // Set the URI on the data field of the intent
-                intent.setData(currentDebtUri);
+                intent.setData(currentPurchaseUri);
                 //intent.putExtra("id", debtID);
                 startActivity(intent);
             }

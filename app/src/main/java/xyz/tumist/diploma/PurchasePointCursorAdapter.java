@@ -18,12 +18,11 @@ import java.util.TimeZone;
 
 import xyz.tumist.diploma.data.DataContract;
 import xyz.tumist.diploma.data.ReceiptsDBHelper;
-import xyz.tumist.diploma.data.ReceiptsProvider;
 
-public class PurchaseCursorAdapter extends CursorAdapter {
+public class PurchasePointCursorAdapter extends CursorAdapter {
     private ReceiptsDBHelper mDbHelper;
 
-    public PurchaseCursorAdapter(Context context, Cursor cursor) {
+    public PurchasePointCursorAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
     }
 
@@ -42,7 +41,7 @@ public class PurchaseCursorAdapter extends CursorAdapter {
         ReceiptsDBHelper receiptsDBHelper = new ReceiptsDBHelper(context);
         SQLiteDatabase database = receiptsDBHelper.getReadableDatabase();
         // Find fields to populate in inflated template
-        TextView purchaseStoreName = (TextView) view.findViewById(R.id.purchases_list_item_store_name);
+        TextView purchaseItemAmount = (TextView) view.findViewById(R.id.purchases_list_item_store_name);
         TextView purchaseDateTime = (TextView) view.findViewById(R.id.purchases_list_item_dateTime);
         TextView purchaseTotalSum = (TextView) view.findViewById(R.id.purchases_list_item_totalSum);
         // Extract properties from cursor
@@ -68,30 +67,30 @@ public class PurchaseCursorAdapter extends CursorAdapter {
 //                null
 //        );
 //        pointCursor.moveToNext();
-        String[] storeProjection = {
-                DataContract.StoreEntry.COLUMN_STORE_NAME,
-                DataContract.StoreEntry.COLUMN_STORE_NICKNAME,
-                DataContract.StoreEntry.COLUMN_STORE_INN
-        };
-        String storeSelection = DataContract.StoreEntry.COLUMN_STORE_ID + " LIKE ?";
-        String[] storeSelectionArgs = {cursor.getString(cursor.getColumnIndexOrThrow(DataContract.PurchaseEntry.COLUMN_PURCHASE_STORE_ID_FK))};
-        Cursor storeCursor = database.query(DataContract.StoreEntry.TABLE_NAME,
-                storeProjection,
-                storeSelection,
-                storeSelectionArgs,
-                null,
-                null,
-                null
-        );
-        storeCursor.moveToNext();
-        String storeName = null;
-        if (storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NICKNAME)) != null){
-            storeName = storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NICKNAME));
-        }
-        else if (storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NAME)) != null){
-            storeName = storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NAME));
-        }
-        else storeName = "ИНН " + storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_INN));
+//        String[] storeProjection = {
+//                DataContract.StoreEntry.COLUMN_STORE_NAME,
+//                DataContract.StoreEntry.COLUMN_STORE_NICKNAME,
+//                DataContract.StoreEntry.COLUMN_STORE_INN
+//        };
+//        String storeSelection = DataContract.StoreEntry.COLUMN_STORE_ID + " LIKE ?";
+//        String[] storeSelectionArgs = {cursor.getString(cursor.getColumnIndexOrThrow(DataContract.PurchaseEntry.COLUMN_PURCHASE_STORE_ID_FK))};
+//        Cursor storeCursor = database.query(DataContract.StoreEntry.TABLE_NAME,
+//                storeProjection,
+//                storeSelection,
+//                storeSelectionArgs,
+//                null,
+//                null,
+//                null
+//        );
+//        storeCursor.moveToNext();
+//        String storeName = null;
+//        if (storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NICKNAME)) != null){
+//            storeName = storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NICKNAME));
+//        }
+//        else if (storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NAME)) != null){
+//            storeName = storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NAME));
+//        }
+//        else storeName = "ИНН " + storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_INN));
 
         /** А тут мы делаем новую локаль, потому что её нет по умолчанию. А нам нужен символ рубля при выводе суммы без лишней мороки.
          *  А еще форматируем дату. А так как в чеке не указывается часовой пояс, со стандартным барнаульским сдвигом получается неправильное время.
@@ -109,8 +108,13 @@ public class PurchaseCursorAdapter extends CursorAdapter {
         str.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), 0, formatedTotalSum.length()-4, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         purchaseTotalSum.setText(str);
 
-        purchaseDateTime.setText(formattedDate);
 
-        purchaseStoreName.setText(storeName);
+        long purchaseItemCount = receiptsDBHelper.getItemsCount(DataContract.GoodEntry.COLUMN_GOOD_PURCHASE_ID_FK + " LIKE " + cursor.getLong(cursor.getColumnIndex(DataContract.PurchaseEntry.COLUMN_PURCHASE_ID)), null);
+        purchaseDateTime.setText(formattedDate);
+        if (purchaseItemCount % 10 == 1) purchaseItemAmount.setText(purchaseItemCount + " позиция");
+        else if (purchaseItemCount % 10 == 2) purchaseItemAmount.setText(purchaseItemCount + " позиции");
+        else if (purchaseItemCount % 10 == 3) purchaseItemAmount.setText(purchaseItemCount + " позиции");
+        else if (purchaseItemCount % 10 == 4) purchaseItemAmount.setText(purchaseItemCount + " позиции");
+        else purchaseItemAmount.setText(purchaseItemCount + " позиций");
     }
 }

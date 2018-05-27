@@ -11,10 +11,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Message;
 import android.provider.ContactsContract;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +33,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.datatype.Duration;
 
 import xyz.tumist.diploma.data.DataContract;
 import xyz.tumist.diploma.data.ReceiptsDBHelper;
@@ -75,7 +79,7 @@ public class jsonParser extends AppCompatActivity {
             storeCheck();
             pointCheck();
             purchaseCheck();
-            itemsAdd();
+            //itemsAdd();
             //jsonReader.close();
         }
         catch (IOException e) {
@@ -131,9 +135,17 @@ public class jsonParser extends AppCompatActivity {
             Uri insertedDebtUri = getContentResolver().insert(DataContract.StoreEntry.CONTENT_URI, storeValues);
             StoreID = ContentUris.parseId(insertedDebtUri);
         } else {
-            cursor.moveToNext();
+            cursor.moveToFirst();
             int storeIdColumnIndex = cursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_ID);
             StoreID = cursor.getLong(storeIdColumnIndex);
+            if (cursor.getString(cursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NAME)) == null) {
+                if (purchase.user != null){
+                    ContentValues storeValues = new ContentValues();
+                    storeValues.put(DataContract.StoreEntry.COLUMN_STORE_NAME, purchase.user);
+                    int numOfUpdatedRows = getContentResolver().update(DataContract.StoreEntry.CONTENT_URI, storeValues,
+                            DataContract.StoreEntry.COLUMN_STORE_ID + " LIKE " + StoreID, null);
+                }
+            }
         }
         cursor.close();
     }
@@ -143,7 +155,10 @@ public class jsonParser extends AppCompatActivity {
             //Если точки нет, то она добавляется в БД
             if (purchase.retailPlaceAddress == null){
                 //Если нет адреса точки, то она добавляется без адреса
-                return;
+                long noAddressPointCount = mDbHelper.getPointsCount(
+                        DataContract.PointEntry.COLUMN_POINT_ADDRESS + " IS NULL AND " + DataContract.PointEntry.COLUMN_STORE_ID_FK + " LIKE " + StoreID,
+                        null);
+                if (noAddressPointCount != 0) return;
             }
             Cursor cursor;
             SQLiteDatabase database = mDbHelper.getReadableDatabase();
@@ -189,7 +204,7 @@ public class jsonParser extends AppCompatActivity {
                 DataContract.PurchaseEntry.COLUMN_PURCHASE_FISCALDRIVENUMBER
         };
         String selection = DataContract.PurchaseEntry.COLUMN_PURCHASE_FISCALDOCUMENTNUMBER + " LIKE ?" + " AND " + DataContract.PurchaseEntry.COLUMN_PURCHASE_FISCALDRIVENUMBER + " LIKE ?";
-        String[] selectionArgs = {String.valueOf(purchase.retailPlaceAddress), String.valueOf(StoreID)};
+        String[] selectionArgs = {String.valueOf(purchase.fiscalDocumentNumber), String.valueOf(purchase.fiscalDriveNumber)};
         cursor = database.query(
                 DataContract.PurchaseEntry.TABLE_NAME,  // Таблица, к которой обращён запрос
                 projection,                               // Колонки, которые требуется вернуть
@@ -227,13 +242,19 @@ public class jsonParser extends AppCompatActivity {
             purchaseValues.put(DataContract.PurchaseEntry.COLUMN_PURCHASE_DATETIME, purchase.dateTime);
             Uri insertedPurchaseUri = getContentResolver().insert(DataContract.PurchaseEntry.CONTENT_URI, purchaseValues);
             PurchaseID = ContentUris.parseId(insertedPurchaseUri);
+            cursor.close();
+            itemsAdd();
         }
         else {
-            cursor.moveToNext();
-            int purchaseIdColumnIndex = cursor.getColumnIndex(DataContract.PurchaseEntry.COLUMN_PURCHASE_ID);
-            PurchaseID = cursor.getLong(purchaseIdColumnIndex);
+//            cursor.moveToNext();
+//            int purchaseIdColumnIndex = cursor.getColumnIndex(DataContract.PurchaseEntry.COLUMN_PURCHASE_ID);
+//            PurchaseID = cursor.getLong(purchaseIdColumnIndex);
+            Toast toast = Toast.makeText(getApplicationContext(), "Такой чек уже добавлен", Toast.LENGTH_SHORT);
+            toast.show();
+            cursor.close();
+            kill_activity();
         }
-        cursor.close();
+
     }
     public void itemsAdd() {
         if (purchase.items.length == 0){
@@ -252,6 +273,7 @@ public class jsonParser extends AppCompatActivity {
             itemValues.put(DataContract.GoodEntry.COLUMN_GOOD_NDS0, purchase.items[i].nds0);
             itemValues.put(DataContract.GoodEntry.COLUMN_GOOD_PRICE, purchase.items[i].price);
             itemValues.put(DataContract.GoodEntry.COLUMN_GOOD_QUANTITY, purchase.items[i].quantity);
+            itemValues.put(DataContract.GoodEntry.COLUMN_GOOD_PURCHASE_ID_FK, PurchaseID);
 //            if (purchase.items[i].storno == "true"){
 //                itemValues.put(DataContract.GoodEntry.COLUMN_GOOD_STORNO, 1);
 //            }
@@ -262,8 +284,16 @@ public class jsonParser extends AppCompatActivity {
             itemValues.put(DataContract.GoodEntry.COLUMN_GOOD_SUM, purchase.items[i].sum);
             Uri insertedItemUri = getContentResolver().insert(DataContract.GoodEntry.CONTENT_URI, itemValues);
         }
+        Toast toast = Toast.makeText(getApplicationContext(), "Покупка добавлена", Toast.LENGTH_SHORT);
+        toast.show();
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        kill_activity();
     }
-
+    void kill_activity()
+    {
+        finish();
+    }
     /** И в классе покупки, и в классе товара убрал несколько полей,
      * потому что они почти не используются, и где-то идут пустыми массивами, а где-то значением false.
      * Лень пока делать обработку этого, всё равно абсолютно не нужно.

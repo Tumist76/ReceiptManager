@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PurchaseActivity">
+
+    <TextView
+        android:id="@+id/purchase_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal"
+        android:textColor="@color/mainText"
+        android:textSize="24dp"
+        tools:text="28 апреля 2018" />
+
+    <TextView
+        android:layout_below="@id/purchase_date"
+        android:id="@+id/purchase_store_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textSize="24dp"
+        android:textColor="@color/mainText"
+        tools:text="ИНН 5406277570"/>
+
+    <TextView
+        android:layout_below="@id/purchase_store_name"
+        android:id="@+id/purchase_total_sum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_margin="8dp"
+        android:textSize="32dp"
+        android:textColor="@color/mainText"
+        tools:text="268.85 Р"/>
+
+    <ListView
+        android:id="@+id/fragment_listview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/purchase_total_sum"
+        />
+
+</RelativeLayout>

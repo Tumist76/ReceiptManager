@@ -1,6 +1,7 @@
 package xyz.tumist.diploma.data;
 
 import android.content.Context;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -45,8 +46,8 @@ public class ReceiptsDBHelper extends SQLiteOpenHelper {
                 DataContract.PurchaseEntry.COLUMN_PURCHASE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 DataContract.PurchaseEntry.COLUMN_PURCHASE_FISCALDOCUMENTNUMBER + " TEXT NOT NULL, " +
                 DataContract.PurchaseEntry.COLUMN_PURCHASE_FISCALDRIVENUMBER + " TEXT NOT NULL, " +
-                DataContract.PurchaseEntry.COLUMN_PURCHASE_CASHTOTALSUM + " INTEGER NOT NULL," +
-                DataContract.PurchaseEntry.COLUMN_PURCHASE_ECASHTOTALSUM + " INTEGER NOT NULL, " +
+                DataContract.PurchaseEntry.COLUMN_PURCHASE_CASHTOTALSUM + " INTEGER," +
+                DataContract.PurchaseEntry.COLUMN_PURCHASE_ECASHTOTALSUM + " INTEGER, " +
                 DataContract.PurchaseEntry.COLUMN_PURCHASE_TOTALSUM + " INTEGER NOT NULL, " +
                 DataContract.PurchaseEntry.COLUMN_PURCHASE_DATETIME + " INTEGER NOT NULL, " +
                 DataContract.PurchaseEntry.COLUMN_PURCHASE_DISCOUNT + " INTEGER, " +
@@ -110,5 +111,37 @@ public class ReceiptsDBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // The database is still at version 1, so there's nothing to do be done here.
+    }
+    public long getPurchasesCount(String purchaseSelection, String[] purchaseSelectionArgs) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        long count = DatabaseUtils.queryNumEntries(
+                db,
+                DataContract.PurchaseEntry.TABLE_NAME,
+                purchaseSelection,
+                purchaseSelectionArgs);
+        db.close();
+        return count;
+    }
+
+    public long getItemsCount(String itemSelection, String[] itemSelectionArgs) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        long count = DatabaseUtils.queryNumEntries(
+                db,
+                DataContract.GoodEntry.TABLE_NAME,
+                itemSelection,
+                itemSelectionArgs);
+        db.close();
+        return count;
+    }
+
+    public long getPointsCount(String pointSelection, String[] pointSelectionArgs) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        long count = DatabaseUtils.queryNumEntries(
+                db,
+                DataContract.PointEntry.TABLE_NAME,
+                pointSelection,
+                pointSelectionArgs);
+        db.close();
+        return count;
     }
 }

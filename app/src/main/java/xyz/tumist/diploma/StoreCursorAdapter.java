@@ -71,7 +71,7 @@ public class StoreCursorAdapter extends CursorAdapter {
         };
         String purchaseSelection = DataContract.PurchaseEntry.COLUMN_PURCHASE_STORE_ID_FK + " LIKE ?";
         String[] purchaseSelectionArgs = {cursor.getString(cursor.getColumnIndexOrThrow(DataContract.StoreEntry.COLUMN_STORE_ID))};
-        Cursor storeCursor = database.query(DataContract.PurchaseEntry.TABLE_NAME,
+        Cursor purchaseCursor = database.query(DataContract.PurchaseEntry.TABLE_NAME,
                 purchaseProjection,
                 purchaseSelection,
                 purchaseSelectionArgs,
@@ -79,12 +79,17 @@ public class StoreCursorAdapter extends CursorAdapter {
                 null,
                 null
         );
-        purchasesCount = storeCursor.getCount();
-        Log.v("storeCursor.getCount()", String.valueOf(storeCursor.getCount()));
+        purchasesCount = purchaseCursor.getCount();
+        Log.v("storeCursor.getCount()", String.valueOf(purchaseCursor.getCount()));
 
         tvstoreName.setText(storeName);
         tvstoreSecondName.setText(storeSecondName);
         tvstoreAmount.setText(String.valueOf(purchasesCount));
-        tvstoreWord.setText("покупок");
+        if (purchasesCount % 10 == 1) tvstoreWord.setText("покупка");
+        else if (purchasesCount % 10 == 2) tvstoreWord.setText("покупки");
+        else if (purchasesCount % 10 == 3) tvstoreWord.setText("покупки");
+        else if (purchasesCount % 10 == 4) tvstoreWord.setText("покупки");
+        else tvstoreWord.setText("покупок");
+
     }
 }
