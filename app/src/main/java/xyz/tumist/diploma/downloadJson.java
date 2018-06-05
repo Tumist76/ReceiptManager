@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -70,24 +71,31 @@ public class downloadJson extends AsyncTask<String, String, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        Log.v("downloadJSON", result.toString());
-        StringBuilder sb = new StringBuilder(result.toString());
-        sb.delete(0, 23);
-        sb.delete(sb.length() - 2,sb.length());
-        String trimmedResult = sb.toString();
-        String timeHuman = trimmedResult.substring(trimmedResult.indexOf("Time\":\"") + 7, trimmedResult.indexOf("Time\":\"") + 26);
-        Log.v("downloadJSON", trimmedResult);
-        Long millis = 0L;
         try {
-            millis = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(timeHuman).getTime();
-        } catch (ParseException e) {
-            e.printStackTrace();
+            Log.v("downloadJSON", result.toString());
+            StringBuilder sb = new StringBuilder(result.toString());
+            sb.delete(0, 23);
+            sb.delete(sb.length() - 2, sb.length());
+            String trimmedResult = sb.toString();
+            String timeHuman = trimmedResult.substring(trimmedResult.indexOf("Time\":\"") + 7, trimmedResult.indexOf("Time\":\"") + 26);
+            Log.v("downloadJSON", trimmedResult);
+            Long millis = 0L;
+            try {
+                millis = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(timeHuman).getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            String finalResult = trimmedResult.replaceAll(timeHuman, String.valueOf(millis));
+            Intent i = new Intent(mContext, jsonParser.class);
+            i.putExtra("jsonString", "true");
+            i.putExtra("result", finalResult);
+            mContext.startActivity(i);
         }
-        String finalResult = trimmedResult.replaceAll(timeHuman,String.valueOf(millis));
-        Intent i=new Intent(mContext,jsonParser.class);
-        i.putExtra("jsonString", "true");
-        i.putExtra("result", finalResult);
-        mContext.startActivity(i);
+        catch (Exception e)
+        {
+            Toast toast = Toast.makeText(mContext.getApplicationContext(), "Ошибка получения чека с сервера", Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 
 }
