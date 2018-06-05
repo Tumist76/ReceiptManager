@@ -61,29 +61,39 @@ public class jsonParser extends AppCompatActivity {
         String type = intent.getType();
         //Проверям, есть ли права на хранилище
         isStoragePermissionGranted();
-        Log.v("Тип ", type);
-        if (Intent.ACTION_SEND.equals(action) && type != null) {
-            //получаем сслыку на файл в URI
-            receivedUri = (Uri)intent.getParcelableExtra(Intent.EXTRA_STREAM);
-        }
-        try {
-            //Открываем буферное чтение
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(receivedUri.getPath()));
-            //Переводим JSON-файл в GSON-объект, ориентируясь на класс
-            purchase = gson.fromJson(bufferedReader, Purchase.class);
-            Log.v(LOG_TAG, "Активирован считывающий Штайнер");
-            Log.v(LOG_TAG, purchase.operator);
-            Log.v(LOG_TAG, purchase.items[0].name);
-            Log.v(LOG_TAG, String.valueOf(purchase.nds0));
+       // String jsonString = intent.getStringExtra("jsonString");
+//        Log.v("Тип ", type);
+       Log.v(LOG_TAG, intent.getStringExtra("result"));
+        if (intent.getStringExtra("jsonString").equals("true"))
+        {
+
+            purchase = gson.fromJson(intent.getStringExtra("result"), Purchase.class);
             //Вызываем методы по порядку
             storeCheck();
             pointCheck();
             purchaseCheck();
-            //itemsAdd();
-            //jsonReader.close();
         }
-        catch (IOException e) {
-            Toast.makeText(getApplicationContext(), "Невозможно открыть файл", Toast.LENGTH_SHORT).show();
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            //получаем сслыку на файл в URI
+            receivedUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            try {
+                //Открываем буферное чтение
+                BufferedReader bufferedReader = new BufferedReader(new FileReader(receivedUri.getPath()));
+                //Переводим JSON-файл в GSON-объект, ориентируясь на класс
+                purchase = gson.fromJson(bufferedReader, Purchase.class);
+                Log.v(LOG_TAG, "Активирован считывающий Штайнер");
+                Log.v(LOG_TAG, purchase.operator);
+                Log.v(LOG_TAG, purchase.items[0].name);
+                Log.v(LOG_TAG, String.valueOf(purchase.nds0));
+                //Вызываем методы по порядку
+                storeCheck();
+                pointCheck();
+                purchaseCheck();
+                //itemsAdd();
+                //jsonReader.close();
+            } catch (IOException e) {
+                Toast.makeText(getApplicationContext(), "Невозможно открыть файл", Toast.LENGTH_SHORT).show();
+            }
         }
 
 }
@@ -309,6 +319,9 @@ public class jsonParser extends AppCompatActivity {
         public String fiscalSign;
         public String kktNumber;
         public String kktRegId;
+        public String addressToCheckFiscalSign;
+        public String senderAddress;
+        public String rawData;
         public Long nds0;
         public Long nds10;
         public Long nds18;

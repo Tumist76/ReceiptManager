@@ -1,11 +1,14 @@
 package xyz.tumist.diploma;
 
+import android.app.Activity;
 import android.content.ContentUris;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Spannable;
@@ -149,11 +152,21 @@ public class PurchaseActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_delete) {
-            deletePurchase();
+            new AlertDialog.Builder(this)
+                    .setTitle("Удаление")
+                    .setMessage("Вы действительно хотите удалить эту покупку?")
+                    //.setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
-            Toast toast = Toast.makeText(getApplicationContext(), "Покупка удалена", Toast.LENGTH_SHORT);
-            toast.show();
-            finish();
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            deletePurchase();
+                            Toast toast = Toast.makeText(getApplicationContext(), "Покупка удалена", Toast.LENGTH_SHORT);
+                            toast.show();
+                            finish();
+                        }})
+                    .setNegativeButton(android.R.string.no, null).show();
+
+
             return true;
         }
         if (id == R.id.action_help) {
@@ -202,5 +215,10 @@ public class PurchaseActivity extends AppCompatActivity {
                 Log.v(LOG_TAG, "Количество удалённых магазинов " + storeRowsDeleted);
             }
         }
+    }
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        setResult(Activity.RESULT_OK);
     }
 }

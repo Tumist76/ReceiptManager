@@ -3,7 +3,9 @@
     package="xyz.tumist.diploma">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -46,7 +48,8 @@
         <activity android:name=".WebViewActivity" />
         <activity android:name=".PurchaseActivity" />
         <activity android:name=".StoreActivity" />
-        <activity android:name=".PointActivity"></activity>
+        <activity android:name=".PointActivity" />
+        <activity android:name=".QRScanner"></activity>
     </application>
 
 </manifest>

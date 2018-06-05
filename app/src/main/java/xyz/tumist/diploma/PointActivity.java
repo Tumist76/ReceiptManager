@@ -32,6 +32,8 @@ public class PointActivity extends AppCompatActivity {
 
     private long pointID;
     private long storeID;
+    Cursor pointCursor;
+    Cursor storeCursor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,14 +48,14 @@ public class PointActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Uri currentPointUri = intent.getData();
-        Cursor pointCursor = getContentResolver().query(currentPointUri, null, null, null, null);
-        pointCursor.moveToNext();
+        pointCursor = getContentResolver().query(currentPointUri, null, null, null, null);
+        pointCursor.moveToFirst();
 
         pointID = pointCursor.getLong(pointCursor.getColumnIndex(DataContract.PointEntry.COLUMN_POINT_ID));
         storeID = pointCursor.getLong(pointCursor.getColumnIndex(DataContract.PointEntry.COLUMN_STORE_ID_FK));
 
         String storeSelection = DataContract.StoreEntry.COLUMN_STORE_ID + " LIKE " + storeID;
-        Cursor storeCursor = getContentResolver().query(DataContract.StoreEntry.CONTENT_URI, null, storeSelection, null, null);
+        storeCursor = getContentResolver().query(DataContract.StoreEntry.CONTENT_URI, null, storeSelection, null, null);
         storeCursor.moveToFirst();
         String storeName = null;
         String storeSecondName = null;
@@ -158,6 +160,7 @@ public class PointActivity extends AppCompatActivity {
         dialogBuilder.setView(dialogView);
 
         final EditText edt = (EditText) dialogView.findViewById(R.id.editText);
+        final TextView tvPointAddress = (TextView) findViewById(R.id.point_address);
 
         dialogBuilder.setTitle("Переименовать точку");
         dialogBuilder.setMessage("Введите новое название");
@@ -168,6 +171,7 @@ public class PointActivity extends AppCompatActivity {
                 int numOfUpdatedRows = getContentResolver().update(DataContract.PointEntry.CONTENT_URI, pointValues,
                         DataContract.PointEntry.COLUMN_POINT_ID + " LIKE " + pointID, null);
                 Log.v("Количество обновленных", String.valueOf(numOfUpdatedRows) );
+                tvPointAddress.setText(edt.getText().toString());
             }
         });
         dialogBuilder.setNegativeButton("Отменить", new DialogInterface.OnClickListener() {
@@ -175,15 +179,22 @@ public class PointActivity extends AppCompatActivity {
                 //pass
             }
         });
-        dialogBuilder.setNeutralButton("Удалить", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                ContentValues pointValues = new ContentValues();
-                pointValues.putNull(DataContract.PointEntry.COLUMN_POINT_NICKNAME);
-                int numOfUpdatedRows = getContentResolver().update(DataContract.PointEntry.CONTENT_URI, pointValues,
-                        DataContract.PointEntry.COLUMN_POINT_ID + " LIKE " + pointID, null);
-                Log.v("Количество обновленных", String.valueOf(numOfUpdatedRows) );
-            }
-        });
+        if (pointCursor.getString(pointCursor.getColumnIndex(DataContract.PointEntry.COLUMN_POINT_NICKNAME)) != null) {
+            dialogBuilder.setNeutralButton("Удалить", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    ContentValues pointValues = new ContentValues();
+                    pointValues.putNull(DataContract.PointEntry.COLUMN_POINT_NICKNAME);
+                    int numOfUpdatedRows = getContentResolver().update(DataContract.PointEntry.CONTENT_URI, pointValues,
+                            DataContract.PointEntry.COLUMN_POINT_ID + " LIKE " + pointID, null);
+                    Log.v("Количество обновленных", String.valueOf(numOfUpdatedRows));
+                    if (pointCursor.getString(pointCursor.getColumnIndex(DataContract.PointEntry.COLUMN_POINT_ADDRESS)) != null) {
+                        tvPointAddress.setText(pointCursor.getString(pointCursor.getColumnIndex(DataContract.PointEntry.COLUMN_POINT_ADDRESS)));
+                    } else {
+                        tvPointAddress.setText("Точка без адреса");
+                    }
+                }
+            });
+        }
         AlertDialog b = dialogBuilder.create();
         b.show();
     }

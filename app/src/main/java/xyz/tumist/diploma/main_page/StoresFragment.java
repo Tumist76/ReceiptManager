@@ -1,5 +1,6 @@
 package xyz.tumist.diploma.main_page;
 
+import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
@@ -7,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,8 +54,19 @@ public class StoresFragment extends Fragment {
                 // Set the URI on the data field of the intent
                 intent.setData(currentStoreUri);
                 //intent.putExtra("id", debtID);
-                startActivity(intent);
+                startActivityForResult(intent, 10003);
             }
         });
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 10003)
+        {
+            // recreate your fragment here
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.detach(this).attach(this).commit();
+        }
     }
 }

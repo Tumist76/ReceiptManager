@@ -21,7 +21,6 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -31,6 +30,7 @@ import xyz.tumist.diploma.data.ReceiptsDBHelper;
 
 public class StoreActivity extends AppCompatActivity {
     private long storeID;
+    Cursor storeCursor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,12 +40,12 @@ public class StoreActivity extends AppCompatActivity {
 
         TextView tvStorePrimaryName = (TextView) findViewById(R.id.store_primary_name);
         TextView tvStoreSecondName = (TextView) findViewById(R.id.store_second_name);
-        TextView tvStoreTotalSum = (TextView) findViewById(R.id.store_card_view_purchases_sum);
-        TextView tvStorePurchasesAmount = (TextView) findViewById(R.id.store_card_view_purchases_amount);
+        TextView tvStoreTotalSum = (TextView) findViewById(R.id.item_card_view_purchases_sum);
+        TextView tvStorePurchasesAmount = (TextView) findViewById(R.id.item_card_view_purchases_quantity);
 
         Intent intent = getIntent();
         Uri currentStoreUri = intent.getData();
-        Cursor storeCursor = getContentResolver().query(currentStoreUri, null, null, null, null);
+        storeCursor = getContentResolver().query(currentStoreUri, null, null, null, null);
         storeCursor.moveToNext();
 
         storeID = storeCursor.getLong(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_ID));
@@ -149,6 +149,8 @@ public class StoreActivity extends AppCompatActivity {
         dialogBuilder.setView(dialogView);
 
         final EditText edt = (EditText) dialogView.findViewById(R.id.editText);
+        final TextView tvStorePrimaryName = (TextView) findViewById(R.id.store_primary_name);
+        final TextView tvStoreSecondName = (TextView) findViewById(R.id.store_second_name);
 
         dialogBuilder.setTitle("Переименовать магазин");
         dialogBuilder.setMessage("Введите новое название");
@@ -159,6 +161,10 @@ public class StoreActivity extends AppCompatActivity {
                 int numOfUpdatedRows = getContentResolver().update(DataContract.StoreEntry.CONTENT_URI, storeValues,
                         DataContract.StoreEntry.COLUMN_STORE_ID + " LIKE " + storeID, null);
                 Log.v("Количество обновленных", String.valueOf(numOfUpdatedRows) );
+                tvStoreSecondName.setText(tvStorePrimaryName.getText());
+                tvStorePrimaryName.setText(edt.getText().toString());
+                tvStorePrimaryName.setPaintFlags(0);
+                tvStoreSecondName.setVisibility(View.VISIBLE);
             }
         });
         dialogBuilder.setNegativeButton("Отменить", new DialogInterface.OnClickListener() {
@@ -166,15 +172,25 @@ public class StoreActivity extends AppCompatActivity {
                 //pass
             }
         });
-        dialogBuilder.setNeutralButton("Удалить", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                ContentValues pointValues = new ContentValues();
-                pointValues.putNull(DataContract.StoreEntry.COLUMN_STORE_NICKNAME);
-                int numOfUpdatedRows = getContentResolver().update(DataContract.StoreEntry.CONTENT_URI, pointValues,
-                        DataContract.StoreEntry.COLUMN_STORE_ID + " LIKE " + storeID, null);
-                Log.v("Количество обновленных", String.valueOf(numOfUpdatedRows) );
-            }
-        });
+        if (storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NICKNAME)) != null) {
+            dialogBuilder.setNeutralButton("Удалить", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    ContentValues pointValues = new ContentValues();
+                    pointValues.putNull(DataContract.StoreEntry.COLUMN_STORE_NICKNAME);
+                    int numOfUpdatedRows = getContentResolver().update(DataContract.StoreEntry.CONTENT_URI, pointValues,
+                            DataContract.StoreEntry.COLUMN_STORE_ID + " LIKE " + storeID, null);
+                    Log.v("Количество обновленных", String.valueOf(numOfUpdatedRows));
+                    if (storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NAME)) != null){
+                        tvStorePrimaryName.setText(storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NAME)));
+                        tvStoreSecondName.setText("ИНН " + storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_INN)));
+                    }
+                    else {
+                        tvStorePrimaryName.setText("ИНН " + storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_INN)));
+                        tvStoreSecondName.setVisibility(View.GONE);
+                    }
+                }
+            });
+        }
         AlertDialog b = dialogBuilder.create();
         b.show();
     }
