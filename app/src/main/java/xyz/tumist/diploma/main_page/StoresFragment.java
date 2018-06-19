@@ -54,7 +54,7 @@ public class StoresFragment extends Fragment {
                 // Set the URI on the data field of the intent
                 intent.setData(currentStoreUri);
                 //intent.putExtra("id", debtID);
-                startActivityForResult(intent, 10003);
+                getActivity().startActivityForResult(intent, 10003);
             }
         });
     }

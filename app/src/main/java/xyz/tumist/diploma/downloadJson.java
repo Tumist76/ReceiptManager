@@ -19,9 +19,14 @@ import java.text.SimpleDateFormat;
 
 public class downloadJson extends AsyncTask<String, String, String> {
     Context mContext;
+    MainActivity mActivity;
+    private static final int REQUEST_CODE_ADD_PURCHASE = 076;
+    private ProgressDialog progDialog;
     String mFN, mFD, mFPD;
-    public downloadJson (Context context, String FN, String FD, String FPD){
+    public downloadJson (MainActivity activity, Context context, String FN, String FD, String FPD){
         mContext = context.getApplicationContext();
+        mActivity = activity;
+        progDialog = new ProgressDialog(activity);
         mFN = FN;
         mFD = FD;
         mFPD = FPD;
@@ -31,12 +36,12 @@ public class downloadJson extends AsyncTask<String, String, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-//        ProgressDialog progDailog = new ProgressDialog(mContext);
-//        progDailog.setMessage("Загрузка чека");
-//        progDailog.setIndeterminate(false);
-//        progDailog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-//        progDailog.setCancelable(true);
-//        progDailog.show();
+        //ProgressDialog progDailog = new ProgressDialog(mContext);
+        progDialog.setMessage("Загрузка чека");
+        progDialog.setIndeterminate(false);
+        progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progDialog.setCancelable(true);
+        progDialog.show();
     }
     @Override
     protected String doInBackground(String... args) {
@@ -71,6 +76,9 @@ public class downloadJson extends AsyncTask<String, String, String> {
 
     @Override
     protected void onPostExecute(String result) {
+        if (progDialog.isShowing()) {
+            progDialog.dismiss();
+        }
         try {
             Log.v("downloadJSON", result.toString());
             StringBuilder sb = new StringBuilder(result.toString());
@@ -79,17 +87,17 @@ public class downloadJson extends AsyncTask<String, String, String> {
             String trimmedResult = sb.toString();
             String timeHuman = trimmedResult.substring(trimmedResult.indexOf("Time\":\"") + 7, trimmedResult.indexOf("Time\":\"") + 26);
             Log.v("downloadJSON", trimmedResult);
-            Long millis = 0L;
+            Long epochSeconds = 0L;
             try {
-                millis = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(timeHuman).getTime();
+                epochSeconds = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(timeHuman).getTime() / 1000L + 25200L;
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            String finalResult = trimmedResult.replaceAll(timeHuman, String.valueOf(millis));
+            String finalResult = trimmedResult.replaceAll(timeHuman, String.valueOf(epochSeconds));
             Intent i = new Intent(mContext, jsonParser.class);
             i.putExtra("jsonString", "true");
             i.putExtra("result", finalResult);
-            mContext.startActivity(i);
+            mActivity.startActivityForResult(i, REQUEST_CODE_ADD_PURCHASE);
         }
         catch (Exception e)
         {

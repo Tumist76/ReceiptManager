@@ -1,6 +1,8 @@
 package xyz.tumist.diploma;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -12,21 +14,27 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.blikoon.qrcodescanner.QrCodeActivity;
+
 import xyz.tumist.diploma.main_page.ItemsFragment;
 import xyz.tumist.diploma.main_page.PurchasesFragment;
 import xyz.tumist.diploma.main_page.StoresFragment;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int REQUEST_CODE_QR_SCAN = 101;
+    private static final int REQUEST_CODE_ADD_PURCHASE = 076;
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private BottomNavigationView navigation;
     private Fragment fragment;
     private FragmentManager fragmentManager;
+    FragmentTransaction ft;
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
@@ -35,8 +43,10 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), QRScanner.class);
-                startActivity(intent);
+//                Intent intent = new Intent(getApplicationContext(), QRScanner.class);
+//                startActivity(intent);
+                Intent i = new Intent(MainActivity.this,QrCodeActivity.class);
+                startActivityForResult( i,REQUEST_CODE_QR_SCAN);
             }
         });
         checkCameraPermissions();
@@ -53,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 //        final FragmentTransaction transaction = fragmentManager.beginTransaction();
 //        transaction.replace(R.id.main_container, fragment).commit(); //установка фрагмента
 //        // Begin the transaction
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft = getSupportFragmentManager().beginTransaction();
         // Replace the contents of the container with the new fragment
         ft.replace(R.id.main_container, new PurchasesFragment());
         // or ft.add(R.id.your_placeholder, new FooFragment());
@@ -101,7 +111,11 @@ public class MainActivity extends AppCompatActivity {
 //            cursor.close();
 //        }
     }
-
+    @Override
+    public void onResume(){
+        super.onResume();
+        //doRefresh();
+    }
     private void checkCameraPermissions() {
         final int MY_CAMERA_REQUEST_CODE = 100;
 
@@ -179,5 +193,90 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode == 10001){
+            //doRefresh();
+            fragment = new PurchasesFragment();
+            final FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.replace(R.id.main_container, fragment).commit();
+        }
+        if(requestCode == 10002){
+            //doRefresh();
+            fragment = new ItemsFragment();
+            final FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.replace(R.id.main_container, fragment).commit();
+        }
+        if(requestCode == 10003){
+            //doRefresh();
+            fragment = new StoresFragment();
+            final FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.replace(R.id.main_container, fragment).commit();
+        }
+        if(requestCode == REQUEST_CODE_ADD_PURCHASE){
+            //doRefresh();
+            fragment = new PurchasesFragment();
+            final FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.replace(R.id.main_container, fragment).commit();
+        }
+        if(resultCode != Activity.RESULT_OK)
+        {
+            Log.d(LOG_TAG,"COULD NOT GET A GOOD RESULT.");
+            if(data==null)
+                return;
+            //Getting the passed result
+            String result = data.getStringExtra("com.blikoon.qrcodescanner.error_decoding_image");
+            if( result!=null)
+            {
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setTitle("Ошибка сканирования");
+                alertDialog.setMessage("Невозможно сканировать код");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+            }
+            return;
 
+        }
+        if(requestCode == REQUEST_CODE_QR_SCAN)
+        {
+            if(data==null)
+                return;
+            //Getting the passed result
+            //String result = data.getStringExtra("com.blikoon.qrcodescanner.got_qr_scan_relult");
+            String scanResult = data.getStringExtra("com.blikoon.qrcodescanner.got_qr_scan_relult");
+            String FN = scanResult.substring(scanResult.indexOf("fn=") + 3, scanResult.indexOf("&i="));
+            String FD = scanResult.substring(scanResult.indexOf("i=") + 2, scanResult.indexOf("&fp="));
+            String FPD = scanResult.substring(scanResult.indexOf("&fp=") + 4, scanResult.indexOf("&n="));
+            Log.v("QRScanner", "FN=" + FN);
+            Log.v("QRScanner", "FD=" + FD);
+            Log.v("QRScanner", "FPD=" + FPD);
+            //Toast.makeText(activity, result.getText(), Toast.LENGTH_SHORT).show();
+            downloadJson DJ = new downloadJson(MainActivity.this,getApplicationContext(), FN, FD, FPD);
+            DJ.execute();
+            //finish();
+//            Log.d(LOG_TAG,"Have scan result in your app activity :"+ result);
+//            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+//            alertDialog.setTitle("Результат сканирования");
+//            alertDialog.setMessage(result);
+//            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+//                    new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            dialog.dismiss();
+//                        }
+//                    });
+//            alertDialog.show();
+
+        }
+    }
+    public void doRefresh(){
+        finish();
+        overridePendingTransition(0, 0);
+        startActivity(getIntent());
+        overridePendingTransition(0, 0);
+    }
 }

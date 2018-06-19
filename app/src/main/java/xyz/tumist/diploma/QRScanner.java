@@ -37,9 +37,9 @@ public class QRScanner extends AppCompatActivity {
                         Log.v("QRScanner", "FD=" + FD);
                         Log.v("QRScanner", "FPD=" + FPD);
                         //Toast.makeText(activity, result.getText(), Toast.LENGTH_SHORT).show();
-                        downloadJson DJ = new downloadJson(getApplicationContext(), FN, FD, FPD);
-                        DJ.execute();
-                        finish();
+//                        downloadJson DJ = new downloadJson(getApplicationContext(), FN, FD, FPD);
+//                        DJ.execute();
+//                        finish();
                     }
                 });
             }

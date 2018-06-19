@@ -73,9 +73,11 @@ public class ItemActivity extends AppCompatActivity {
             else if (itemArray.getCount() % 10 == 4) tvItemPurchasesQuantity.setText(itemArray.getCount() + " покупки");
             else tvItemPurchasesQuantity.setText(itemArray.getCount() + " покупок");
             Cursor sumCursor = db.rawQuery("SELECT SUM(" + DataContract.GoodEntry.COLUMN_GOOD_SUM + ") as Total FROM " + DataContract.GoodEntry.TABLE_NAME + " WHERE " + DataContract.GoodEntry.COLUMN_GOOD_NAME + " = '" + itemName + "'", null);
+
             if (sumCursor.moveToFirst()) {
                 long total = sumCursor.getLong(sumCursor.getColumnIndex("Total"));// get final total
-                tvItemPurchasesSum.setText(n.format(total / 100.0));
+                Log.v("TotalSum", String.valueOf(total));
+                tvItemPurchasesSum.setText(n.format(total / 100.00));
             }
             long itemMinPrice;
             long itemMaxPrice;
@@ -95,7 +97,7 @@ public class ItemActivity extends AppCompatActivity {
                 String purchaseItemMaxSelection = DataContract.PurchaseEntry.COLUMN_PURCHASE_ID + " = " + itemMaxPriceCursor.getString(itemMaxPriceCursor.getColumnIndex(DataContract.GoodEntry.COLUMN_GOOD_PURCHASE_ID_FK));
                 Cursor purchaseItemMax = getContentResolver().query(DataContract.PurchaseEntry.CONTENT_URI,null, purchaseItemMaxSelection, null, null);
                 purchaseItemMax.moveToFirst();
-                tvItemMaxPrice.setText(n.format(itemMaxPrice/100.0));
+                tvItemMaxPrice.setText(n.format(itemMaxPrice/100.00));
                 tvItemMaxPriceDate.setText(sdf.format(purchaseItemMax.getLong(purchaseItemMax.getColumnIndexOrThrow(DataContract.PurchaseEntry.COLUMN_PURCHASE_DATETIME))*1000L));
                 purchaseItemMax.close();
                 itemMaxPriceCursor.close();
@@ -103,7 +105,7 @@ public class ItemActivity extends AppCompatActivity {
                 String purchaseItemMinSelection = DataContract.PurchaseEntry.COLUMN_PURCHASE_ID + " = " + itemMinPriceCursor.getString(itemMinPriceCursor.getColumnIndex(DataContract.GoodEntry.COLUMN_GOOD_PURCHASE_ID_FK));
                 Cursor purchaseItemMin = getContentResolver().query(DataContract.PurchaseEntry.CONTENT_URI,null, purchaseItemMinSelection, null, null);
                 purchaseItemMin.moveToFirst();
-                tvItemMinPrice.setText(n.format(itemMinPriceCursor.getLong(itemMinPriceCursor.getColumnIndex(DataContract.GoodEntry.COLUMN_GOOD_PRICE))/100.0));
+                tvItemMinPrice.setText(n.format(itemMinPriceCursor.getLong(itemMinPriceCursor.getColumnIndex(DataContract.GoodEntry.COLUMN_GOOD_PRICE))/100.00));
                 tvItemMinPriceDate.setText(sdf.format(purchaseItemMin.getLong(purchaseItemMin.getColumnIndexOrThrow(DataContract.PurchaseEntry.COLUMN_PURCHASE_DATETIME))*1000L));
                 purchaseItemMin.close();
                 itemMinPriceCursor.close();
@@ -119,7 +121,7 @@ public class ItemActivity extends AppCompatActivity {
         else
         {
             tvItemPurchasesQuantity.setText("1 покупка");
-            tvItemPurchasesSum.setText(n.format(itemCursor.getLong(itemCursor.getColumnIndex(DataContract.GoodEntry.COLUMN_GOOD_SUM))/100.07));
+            tvItemPurchasesSum.setText(n.format(itemCursor.getLong(itemCursor.getColumnIndex(DataContract.GoodEntry.COLUMN_GOOD_SUM))/100.00));
             llStats.setVisibility(GONE);
             tvItemPriceNoDifference.setVisibility(GONE);
         }

@@ -58,7 +58,12 @@ public class StoreCursorAdapter extends CursorAdapter {
         int purchasesCount = 0;
         if (cursor.getString(cursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NICKNAME)) != null){
             storeName = cursor.getString(cursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NICKNAME));
-            storeSecondName = cursor.getString(cursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NAME));
+            if (cursor.getString(cursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NAME)) != null) {
+                storeSecondName = cursor.getString(cursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NAME));
+            } else
+            {
+                storeSecondName = "ИНН " + cursor.getString(cursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_INN));
+            }
         }
         else if (cursor.getString(cursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NAME)) != null){
             storeName = cursor.getString(cursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NAME));

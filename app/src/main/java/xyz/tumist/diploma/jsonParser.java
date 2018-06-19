@@ -63,16 +63,8 @@ public class jsonParser extends AppCompatActivity {
         isStoragePermissionGranted();
        // String jsonString = intent.getStringExtra("jsonString");
 //        Log.v("Тип ", type);
-       Log.v(LOG_TAG, intent.getStringExtra("result"));
-        if (intent.getStringExtra("jsonString").equals("true"))
-        {
+//       Log.v(LOG_TAG, intent.getStringExtra("result"));
 
-            purchase = gson.fromJson(intent.getStringExtra("result"), Purchase.class);
-            //Вызываем методы по порядку
-            storeCheck();
-            pointCheck();
-            purchaseCheck();
-        }
         if (Intent.ACTION_SEND.equals(action) && type != null) {
             //получаем сслыку на файл в URI
             receivedUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
@@ -94,6 +86,19 @@ public class jsonParser extends AppCompatActivity {
             } catch (IOException e) {
                 Toast.makeText(getApplicationContext(), "Невозможно открыть файл", Toast.LENGTH_SHORT).show();
             }
+        }
+        else try {
+            if (intent.getStringExtra("jsonString").equals("true"))
+            {
+
+                purchase = gson.fromJson(intent.getStringExtra("result"), Purchase.class);
+                //Вызываем методы по порядку
+                storeCheck();
+                pointCheck();
+                purchaseCheck();
+            }
+        } catch (Exception e)
+        {
         }
 
 }
@@ -142,7 +147,7 @@ public class jsonParser extends AppCompatActivity {
             if (purchase.user != null) {
                 storeValues.put(DataContract.StoreEntry.COLUMN_STORE_NAME, purchase.user);
             }
-            Uri insertedDebtUri = getContentResolver().insert(DataContract.StoreEntry.CONTENT_URI, storeValues);
+;            Uri insertedDebtUri = getContentResolver().insert(DataContract.StoreEntry.CONTENT_URI, storeValues);
             StoreID = ContentUris.parseId(insertedDebtUri);
         } else {
             cursor.moveToFirst();
@@ -296,8 +301,9 @@ public class jsonParser extends AppCompatActivity {
         }
         Toast toast = Toast.makeText(getApplicationContext(), "Покупка добавлена", Toast.LENGTH_SHORT);
         toast.show();
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+
+        //Intent intent = new Intent(this, MainActivity.class);
+        //startActivity(intent);
         kill_activity();
     }
     void kill_activity()

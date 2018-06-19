@@ -31,6 +31,7 @@ import xyz.tumist.diploma.data.ReceiptsDBHelper;
 public class StoreActivity extends AppCompatActivity {
     private long storeID;
     Cursor storeCursor;
+    Uri currentStoreUri;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +45,7 @@ public class StoreActivity extends AppCompatActivity {
         TextView tvStorePurchasesAmount = (TextView) findViewById(R.id.item_card_view_purchases_quantity);
 
         Intent intent = getIntent();
-        Uri currentStoreUri = intent.getData();
+        currentStoreUri = intent.getData();
         storeCursor = getContentResolver().query(currentStoreUri, null, null, null, null);
         storeCursor.moveToNext();
 
@@ -161,8 +162,26 @@ public class StoreActivity extends AppCompatActivity {
                 int numOfUpdatedRows = getContentResolver().update(DataContract.StoreEntry.CONTENT_URI, storeValues,
                         DataContract.StoreEntry.COLUMN_STORE_ID + " LIKE " + storeID, null);
                 Log.v("Количество обновленных", String.valueOf(numOfUpdatedRows) );
-                tvStoreSecondName.setText(tvStorePrimaryName.getText());
-                tvStorePrimaryName.setText(edt.getText().toString());
+                storeCursor = getContentResolver().query(currentStoreUri, null, null, null, null);
+                storeCursor.moveToNext();
+
+                //TODO: Это повторяющийся код. Вынести в отдельный метод и поработать с излишним вызовом курсоров
+                if (storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NICKNAME)) != null){
+                    tvStorePrimaryName.setText(storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NICKNAME)));
+                    if (storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NAME)) != null) {
+                        tvStoreSecondName.setText(storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NAME)));
+                    } else tvStoreSecondName.setText("ИНН " + storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_INN)));
+
+                }
+                else if (storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NAME)) != null){
+                    tvStorePrimaryName.setText(storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NAME)));
+                    tvStoreSecondName.setText("ИНН " + storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_INN)));
+                }
+                else {
+                    tvStorePrimaryName.setText("ИНН " + storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_INN)));
+                    tvStoreSecondName.setVisibility(View.GONE);
+                }
+
                 tvStorePrimaryName.setPaintFlags(0);
                 tvStoreSecondName.setVisibility(View.VISIBLE);
             }
@@ -172,7 +191,11 @@ public class StoreActivity extends AppCompatActivity {
                 //pass
             }
         });
+
+        storeCursor = getContentResolver().query(currentStoreUri, null, null, null, null);
+        storeCursor.moveToNext();
         if (storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NICKNAME)) != null) {
+            edt.setText(storeCursor.getString(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_NICKNAME)));
             dialogBuilder.setNeutralButton("Удалить", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     ContentValues pointValues = new ContentValues();

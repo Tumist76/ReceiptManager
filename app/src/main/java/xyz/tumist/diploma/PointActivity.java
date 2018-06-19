@@ -34,6 +34,7 @@ public class PointActivity extends AppCompatActivity {
     private long storeID;
     Cursor pointCursor;
     Cursor storeCursor;
+    Uri currentPointUri;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +48,7 @@ public class PointActivity extends AppCompatActivity {
         TextView tvPointPurchasesAmount = (TextView) findViewById(R.id.point_card_view_purchases_amount);
 
         Intent intent = getIntent();
-        Uri currentPointUri = intent.getData();
+        currentPointUri = intent.getData();
         pointCursor = getContentResolver().query(currentPointUri, null, null, null, null);
         pointCursor.moveToFirst();
 
@@ -179,6 +180,9 @@ public class PointActivity extends AppCompatActivity {
                 //pass
             }
         });
+
+        pointCursor = getContentResolver().query(currentPointUri, null, null, null, null);
+        pointCursor.moveToFirst();
         if (pointCursor.getString(pointCursor.getColumnIndex(DataContract.PointEntry.COLUMN_POINT_NICKNAME)) != null) {
             dialogBuilder.setNeutralButton("Удалить", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {

@@ -69,7 +69,7 @@ public class ItemsFragment extends Fragment {
                 // Set the URI on the data field of the intent
                 intent.setData(currentDebtUri);
                 //intent.putExtra("id", debtID);
-                startActivityForResult(intent, 10002);
+                getActivity().startActivityForResult(intent, 10002);
             }
         });
     }
