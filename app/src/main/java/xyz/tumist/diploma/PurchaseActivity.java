@@ -195,7 +195,7 @@ public class PurchaseActivity extends AppCompatActivity {
         }
 
         long purchasesPointCount = handler.getPurchasesCount(
-                DataContract.PurchaseEntry.COLUMN_PURCHASE_POINT_ID_FK + " LIKE " + storeID,
+                DataContract.PurchaseEntry.COLUMN_PURCHASE_POINT_ID_FK + " LIKE " + pointID,
                 null);
         if (purchasesPointCount == 0) {
             int pointRowsDeleted = getContentResolver().delete(
@@ -204,10 +204,10 @@ public class PurchaseActivity extends AppCompatActivity {
                     null);
             Log.v(LOG_TAG, "Количество удалённых точек продаж " + pointRowsDeleted);
 
-            long purchasesStoreCount = handler.getPurchasesCount(
+            long PointCount = handler.getPurchasesCount(
                     DataContract.PurchaseEntry.COLUMN_PURCHASE_STORE_ID_FK + " LIKE " + storeID,
                     null);
-            if (purchasesStoreCount == 0) {
+            if (PointCount == 0) {
                 int storeRowsDeleted = getContentResolver().delete(
                         DataContract.StoreEntry.CONTENT_URI,
                         DataContract.StoreEntry.COLUMN_STORE_ID + " LIKE " + storeID,

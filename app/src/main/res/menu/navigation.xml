@@ -16,4 +16,8 @@
         android:icon="@drawable/store"
         android:title="@string/title_stores" />
 
+    <item
+        android:id="@+id/navigation_stats"
+        android:icon="@drawable/timelapse"
+        android:title="@string/title_stats" />
 </menu>

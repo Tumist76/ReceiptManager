@@ -19,10 +19,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.text.NumberFormat;
+import java.util.Calendar;
 import java.util.Locale;
 
 import xyz.tumist.diploma.data.DataContract;
@@ -39,17 +41,48 @@ public class StoreActivity extends AppCompatActivity {
         ReceiptsDBHelper handler = new ReceiptsDBHelper(this);
         Locale myLocale = new Locale("ru","RU");
 
-        TextView tvStorePrimaryName = (TextView) findViewById(R.id.store_primary_name);
-        TextView tvStoreSecondName = (TextView) findViewById(R.id.store_second_name);
-        TextView tvStoreTotalSum = (TextView) findViewById(R.id.item_card_view_purchases_sum);
-        TextView tvStorePurchasesAmount = (TextView) findViewById(R.id.item_card_view_purchases_quantity);
-
         Intent intent = getIntent();
         currentStoreUri = intent.getData();
         storeCursor = getContentResolver().query(currentStoreUri, null, null, null, null);
         storeCursor.moveToNext();
 
         storeID = storeCursor.getLong(storeCursor.getColumnIndex(DataContract.StoreEntry.COLUMN_STORE_ID));
+
+        TextView tvStorePrimaryName = (TextView) findViewById(R.id.store_primary_name);
+        TextView tvStoreSecondName = (TextView) findViewById(R.id.store_second_name);
+        TextView tvStoreTotalSum = (TextView) findViewById(R.id.item_card_view_purchases_sum);
+        TextView tvStorePurchasesAmount = (TextView) findViewById(R.id.item_card_view_purchases_quantity);
+        TextView tvThisMonthQuantity = findViewById(R.id.item_card_view_this_month_purchases_quantity);
+        TextView tvThisMonthSum = findViewById(R.id.item_card_view_this_month_purchases_sum);
+
+        long purchasesStoreCount = handler.getPurchasesCount(
+                DataContract.PurchaseEntry.COLUMN_PURCHASE_STORE_ID_FK + " LIKE " + storeID,
+                null);
+        tvStorePurchasesAmount.setText(getFormattedQuantity(purchasesStoreCount) + " всего");
+
+        SQLiteDatabase db = handler.getWritableDatabase();
+        String sumClause = "SUM("+ DataContract.PurchaseEntry.COLUMN_PURCHASE_TOTALSUM + ")";
+        // Query for items from the database and get a cursor back
+        //Получаем и ставим данные за последний месяц
+        String thisMonthQuery = "SELECT " + sumClause + " FROM " + DataContract.PurchaseEntry.TABLE_NAME +
+                " WHERE " + DataContract.PurchaseEntry.COLUMN_PURCHASE_DATETIME + " > " + getFirstDateOfCurrentMonth() +
+                " AND " + DataContract.PurchaseEntry.COLUMN_PURCHASE_STORE_ID_FK + " = " + storeID + "; ";
+        Cursor thisMonthPurchasesSumCursor = db.rawQuery(thisMonthQuery, null);
+        Cursor thisMonthPurchaseQuantityCursor = db.rawQuery("SELECT * FROM " + DataContract.PurchaseEntry.TABLE_NAME +
+                " WHERE " + DataContract.PurchaseEntry.COLUMN_PURCHASE_DATETIME + " > " + getFirstDateOfCurrentMonth() +
+                " AND " + DataContract.PurchaseEntry.COLUMN_PURCHASE_STORE_ID_FK + " = " + storeID + "; ", null);
+        if (thisMonthPurchaseQuantityCursor.moveToFirst()){
+            thisMonthPurchasesSumCursor.moveToFirst();
+            CurrencyConverter CC = new CurrencyConverter();
+            tvThisMonthSum.setText(CC.getConvertedFormattedCurrency(thisMonthPurchasesSumCursor.getLong(0)));
+            tvThisMonthQuantity.setText(getFormattedQuantity(thisMonthPurchaseQuantityCursor.getCount()) + " за этот месяц");
+            thisMonthPurchaseQuantityCursor.close();
+            thisMonthPurchasesSumCursor.close();
+        } else {
+            LinearLayout llStoreSumThisMonth = findViewById(R.id.store_ll_this_month);
+            llStoreSumThisMonth.setVisibility(View.GONE);
+        }
+
 
         String storeName = null;
         String storeSecondName = null;
@@ -70,16 +103,6 @@ public class StoreActivity extends AppCompatActivity {
             tvStoreSecondName.setVisibility(View.GONE);
         }
 
-        long purchasesStoreCount = handler.getPurchasesCount(
-                DataContract.PurchaseEntry.COLUMN_PURCHASE_STORE_ID_FK + " LIKE " + storeID,
-                null);
-        if (purchasesStoreCount % 10 == 1) tvStorePurchasesAmount.setText(String.valueOf(purchasesStoreCount) + " покупка");
-        else if (purchasesStoreCount % 10 == 2) tvStorePurchasesAmount.setText(String.valueOf(purchasesStoreCount) + " покупки");
-        else if (purchasesStoreCount % 10 == 3) tvStorePurchasesAmount.setText(String.valueOf(purchasesStoreCount) + " покупки");
-        else if (purchasesStoreCount % 10 == 4) tvStorePurchasesAmount.setText(String.valueOf(purchasesStoreCount) + " покупки");
-        else tvStorePurchasesAmount.setText(String.valueOf(purchasesStoreCount) + " покупок");
-
-        SQLiteDatabase db = handler.getReadableDatabase();
         Cursor purchaseSumCursor = db.rawQuery("select sum(" + DataContract.PurchaseEntry.COLUMN_PURCHASE_TOTALSUM +
                 ") from " + DataContract.PurchaseEntry.TABLE_NAME +
                 " where " + DataContract.PurchaseEntry.COLUMN_PURCHASE_STORE_ID_FK + " = '" + storeID + "' ;", null);
@@ -217,5 +240,25 @@ public class StoreActivity extends AppCompatActivity {
         AlertDialog b = dialogBuilder.create();
         b.show();
     }
+    private String getFormattedQuantity(long count){
+        if (count % 10 == 1) return count + " покупка";
+        else if (count % 10 == 2) return count + " покупки";
+        else if (count % 10 == 3) return count + " покупки";
+        else if (count % 10 == 4) return count + " покупки";
+        else return count + " покупок";
+    }
+    private long getFirstDateOfCurrentMonth() {
+        // get today and clear time of day
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0); // ! clear would not reset the hour of day !
+        cal.clear(Calendar.MINUTE);
+        cal.clear(Calendar.SECOND);
+        cal.clear(Calendar.MILLISECOND);
 
+        // get start of the month
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+
+        Log.v("Epoch firstday","Start of the month:       " + cal.getTimeInMillis()/1000);
+        return cal.getTimeInMillis()/1000L;
+    }
 }

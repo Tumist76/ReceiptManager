@@ -25,7 +25,10 @@ import com.blikoon.qrcodescanner.QrCodeActivity;
 
 import xyz.tumist.diploma.main_page.ItemsFragment;
 import xyz.tumist.diploma.main_page.PurchasesFragment;
+import xyz.tumist.diploma.main_page.StatsFragment;
 import xyz.tumist.diploma.main_page.StoresFragment;
+
+import static android.view.View.GONE;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_QR_SCAN = 101;
@@ -34,12 +37,13 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView navigation;
     private Fragment fragment;
     private FragmentManager fragmentManager;
+    FloatingActionButton fab;
     FragmentTransaction ft;
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        FloatingActionButton fab = findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -78,12 +82,19 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.navigation_purchases:
                         fragment = new PurchasesFragment();
                         Log.v(LOG_TAG, "Тыкнуты покупки в навигации");
+                        showFAB();
                         break;
                     case R.id.navigation_items:
                         fragment = new ItemsFragment();
+                        showFAB();
                         break;
                     case R.id.navigation_stores:
                         fragment = new StoresFragment();
+                        showFAB();
+                        break;
+                    case R.id.navigation_stats:
+                        fragment = new StatsFragment();
+                        hideFAB();
                         break;
                 }
                 final FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -213,6 +224,12 @@ public class MainActivity extends AppCompatActivity {
             final FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.replace(R.id.main_container, fragment).commit();
         }
+        if(requestCode == 10004){
+            //doRefresh();
+            fragment = new StatsFragment();
+            final FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.replace(R.id.main_container, fragment).commit();
+        }
         if(requestCode == REQUEST_CODE_ADD_PURCHASE){
             //doRefresh();
             fragment = new PurchasesFragment();
@@ -278,5 +295,11 @@ public class MainActivity extends AppCompatActivity {
         overridePendingTransition(0, 0);
         startActivity(getIntent());
         overridePendingTransition(0, 0);
+    }
+    private void hideFAB(){
+        fab.setVisibility(GONE);
+    }
+    private void showFAB(){
+        fab.setVisibility(View.VISIBLE);
     }
 }

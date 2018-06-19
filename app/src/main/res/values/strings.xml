@@ -1,10 +1,12 @@
 <resources>
-    <string name="app_name">Diploma</string>
+    <string name="app_name">Чекохранитель</string>
 
 
     <string name="title_goods">Товары</string>
     <string name="title_purchases">Покупки</string>
     <string name="title_stores">Магазины</string>
+    <string name="title_stats">Статистика</string>
+
     <string name="action_help">Справка</string>
     <string name="action_delete">Удалить</string>
     <string name="action_rename">Переименовать</string>
