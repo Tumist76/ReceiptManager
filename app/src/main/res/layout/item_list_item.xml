@@ -21,10 +21,9 @@
         <TextView
             android:id="@+id/items_list_item_name"
             android:layout_width="220dp"
+            android:layout_height="19dp"
+            android:layout_marginBottom="10dp"
             android:height="22dp"
-            android:textSize="16sp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
             android:fontFamily="sans-serif"
             tools:text="Вода Холодный ручей 5л негаз. очень вкусная и приятная, мне нравится" />
 

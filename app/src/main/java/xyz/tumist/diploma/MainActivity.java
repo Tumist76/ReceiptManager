@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -17,9 +18,12 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.blikoon.qrcodescanner.QrCodeActivity;
 
@@ -37,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView navigation;
     private Fragment fragment;
     private FragmentManager fragmentManager;
+    private ConstraintLayout clView;
+    private FrameLayout flView;
     FloatingActionButton fab;
     FragmentTransaction ft;
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         checkCameraPermissions();
         checkStorageReadPermission();
         checkStorageWritePermission();
+
         navigation = (BottomNavigationView)findViewById(R.id.navigation);
 //        inflatemenu убивает приложение, хммм. Но я и через XML его забил.
 //        bottomNavigation.inflateMenu(R.menu.navigation);
@@ -183,6 +190,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+//        flView = findViewById(R.id.main_container);
+//        int actionBarHeight = getActionBarHeight();
+//        setMargins(flView, 0, actionBarHeight/2,0, 0);
         return true;
     }
 
@@ -301,5 +311,23 @@ public class MainActivity extends AppCompatActivity {
     }
     private void showFAB(){
         fab.setVisibility(View.VISIBLE);
+    }
+    private void setMargins (View view, int left, int top, int right, int bottom) {
+        if (view.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
+            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+            p.setMargins(left, top, right, bottom);
+            view.requestLayout();
+        }
+    }
+    private int getActionBarHeight() {
+        int actionBarHeight = getSupportActionBar().getHeight();
+        if (actionBarHeight != 0)
+            return actionBarHeight;
+        final TypedValue tv = new TypedValue();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
+                actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+        }
+        return actionBarHeight;
     }
 }

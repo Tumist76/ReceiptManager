@@ -144,7 +144,7 @@ public class jsonParser extends AppCompatActivity {
             SQLiteDatabase dbWrite = mDbHelper.getWritableDatabase();
             ContentValues storeValues = new ContentValues();
             storeValues.put(DataContract.StoreEntry.COLUMN_STORE_INN, purchase.userInn);
-            if (purchase.user != null) {
+            if (!purchase.user.isEmpty()) {
                 storeValues.put(DataContract.StoreEntry.COLUMN_STORE_NAME, purchase.user);
             }
 ;            Uri insertedDebtUri = getContentResolver().insert(DataContract.StoreEntry.CONTENT_URI, storeValues);
