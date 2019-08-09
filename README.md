@@ -5,8 +5,8 @@
 
 **В настоящее время не работает из-за измененного API ФНС.** 
 
-| <img src="/Description/1.png" width="400px"</img> | <img src="/Description/3.png" width="400px"</img> |
+| <img src="/Description/1.png" width="400px"></img> | <img src="/Description/3.png" width="400px"></img> |
 |---------------------------------------------------|---------------------------------------------------|
 |                   Список покупок                  |                Список точек продаж                |
-| <img src="/Description/5.png" width="400px"</img> | <img src="/Description/7.png" width="400px"</img> |
+| <img src="/Description/5.png" width="400px"></img> | <img src="/Description/7.png" width="400px"></img> |
 | Страница информации о товаре                      | Страница информации о точке продаж                |
