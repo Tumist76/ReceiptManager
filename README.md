@@ -8,8 +8,9 @@
 [Документация по дипломному проекту](https://github.com/Tumist76/ReceiptManager/blob/master/Description/Diploma.docx?raw=true)
 
 ###Скриншоты
-| <img src="/Description/1.png" width="400px"></img> | <img src="/Description/3.png" width="400px"></img> |
+
+| <img src="/Description/1.png" width="350px"></img> | <img src="/Description/3.png" width="350px"></img> |
 |---------------------------------------------------|---------------------------------------------------|
 |                   Список покупок                  |                Список точек продаж                |
-| <img src="/Description/5.png" width="30px"></img> | <img src="/Description/7.png" width="400px"></img> |
+| <img src="/Description/5.png" width="350px"></img> | <img src="/Description/7.png" width="350px"></img> |
 | Страница информации о товаре                      | Страница информации о точке продаж                |
