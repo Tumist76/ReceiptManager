@@ -13,8 +13,6 @@
 
 [Документация по дипломному проекту](https://github.com/Tumist76/ReceiptManager/blob/master/Description/Diploma.docx?raw=true)
 
-##Скриншоты
-
 | <img src="/Description/1.png" width="350px"></img> | <img src="/Description/3.png" width="350px"></img> |
 |---------------------------------------------------|---------------------------------------------------|
 |                   Список покупок                  |                Список точек продаж                |
